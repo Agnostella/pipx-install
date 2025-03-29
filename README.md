@@ -15,11 +15,11 @@ The `pipx-install` GitHub Action sets up a `pipx` environment, caches it, and in
 
 The following environment variables are set:
 
-- PIPX_HOME: ${PIPX_CACHE}/home
-- PIPX_MAN_DIR: ${PIPX_CACHE}/man
-- PIPX_BIN_DIR: ${PIPX_CACHE}/bin
+- `PIPX_HOME`
+- `PIPX_MAN_DIR`
+- `PIPX_BIN_DIR`
 
-The PIPX_BIN_DIR is added to the PATH for later steps.
+The `PIPX_BIN_DIR` is added to the PATH for later steps.
 
 ## Usage
 
