@@ -1,0 +1,54 @@
+name: pipx install
+description: Install and cache packages with pipx
+
+inputs:
+  package-specs:
+    description: Package to install with pipx
+    required: true
+
+outputs:
+  cache-hit:
+    description: Whether the cache was hit or not
+    value: ${{ steps.pipx-cache.outputs.cache-hit }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup pipx environment
+      id: pipx-env-setup
+      shell: bash
+      # pipx default home and bin dir are not writable by the cache action
+      # so override them here and add the bin dir to PATH for later steps.
+      # This also ensures the pipx cache only contains the tool being installed.
+      run: |
+        python -m pip install -U pipx
+
+        PACKAGE_KEY=$(echo "${{ inputs.package }}" | sed -E 's/[^a-zA-Z0-9._-]/_/g' | sed -E 's/_$//')
+        PIPX_CACHE="${{ runner.temp }}/.pipx_cache"
+        PIPX_BIN_DIR="${PIPX_CACHE}/bin"
+
+        echo "pipx-package-key=${PACKAGE_KEY}" >> $GITHUB_OUTPUT
+        echo "pipx-cache-path=${PIPX_CACHE}" >> $GITHUB_OUTPUT
+        echo "pipx-version=$(pipx --version | cut -d '.' -f1)" >> $GITHUB_OUTPUT
+        echo "python-version=$(python --version | cut -d ' ' -f2 | cut -d '.' -f1-2)" >> $GITHUB_OUTPUT
+
+        echo "PIPX_HOME=${PIPX_CACHE}/home" >> $GITHUB_ENV
+        echo "PIPX_MAN_DIR=${PIPX_CACHE}/man" >> $GITHUB_ENV
+        echo "PIPX_BIN_DIR=${PIPX_CACHE}/bin" >> $GITHUB_ENV
+
+        echo "${PIPX_BIN_DIR}" >> $GITHUB_PATH
+
+    - name: Cache pipx environment
+      id: pipx-cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.pipx-env-setup.outputs.pipx-cache-path }}
+        key: ${{ runner.os }}-python${{ steps.pipx-env-setup.outputs.python-version }}-pipx${{ steps.pipx-env-setup.outputs.pipx-version }}
+
+    - name: Install packages
+      shell: bash
+      run: |
+        if [[ "${{ steps.pipx-cache.outputs.cache-hit }}" != "true" ]]; then
+          python -m pipx install \
+            ${{ inputs.package-specs }}
+        fi

@@ -1,0 +1,96 @@
+name: Test action
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  PACKAGE_SPECS: >-
+    'cfn-lint>=1.32.0,<2.0.0'
+    'uv==0.6.10'
+    'bandit==1.8.3'
+
+jobs:
+  pipx-install:
+    name: pipx install
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install packages
+        uses: ./
+        with:
+          package-specs: ${{ env.PACKAGE_SPECS }}
+
+      - name: Verify installations
+        run: |
+          packages=(
+            cfn-lint
+            uv
+            bandit
+          )
+
+          for package in "${packages[@]}"; do
+            if ! command -v "${package}"; then
+              echo "${package} is not installed"
+              exit 1
+            fi
+
+            installed_version=$("${package}" --version)
+            echo "${package} version:"
+            echo "${installed_version}"
+          done
+
+  verify-pipx-cache:
+    name: Verify pipx cache
+    needs: [pipx-install]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install packages
+        uses: ./
+        id: pipx-install
+        with:
+          package-specs: ${{ env.PACKAGE_SPECS }}
+
+      - name: Verify installations
+        run: |
+          if [[ "${{ steps.pipx-install.outputs.cache-hit }}" != "true" ]]; then
+            echo "Expected packages to have been installed from cache"
+            exit 1
+          fi
+
+          packages=(
+            cfn-lint
+            uv
+            bandit
+          )
+
+          for package in "${packages[@]}"; do
+            if ! command -v "${package}"; then
+              echo "${package} is not installed"
+              exit 1
+            fi
+
+            installed_version=$("${package}" --version)
+            echo "${package} version:"
+            echo "${installed_version}"
+          done
