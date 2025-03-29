@@ -1,6 +1,6 @@
-name: agnustella - pipx install
+name: agnostella - pipx install
 description: Install and cache packages with pipx
-author: agnustella
+author: agnostella
 branding:
   icon: terminal
   color: blue
