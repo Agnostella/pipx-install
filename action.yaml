@@ -1,5 +1,7 @@
 name: agnustella - pipx install
 description: Install and cache packages with pipx
+icon: 'terminal'
+color: 'blue'
 
 inputs:
   package-specs:
