@@ -1,4 +1,4 @@
-name: pipx install
+name: agnustella - pipx install
 description: Install and cache packages with pipx
 
 inputs:
