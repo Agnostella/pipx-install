@@ -3,11 +3,12 @@
 Install and cache Python packages with `pipx` in your GitHub Actions workflows.
 
 ## Description
+
 The `pipx-install` GitHub Action sets up a `pipx` environment, caches it, and installs specified Python packages using `pipx`. This action helps to speed up your workflows by caching the pipx environment and reusing it in subsequent runs.
 
 ## Inputs
 
-- `package-specs` (required): The specifications of the package(s) to install with `pipx`.
+- `package-specs` (required): The specifications of the package(s) to install with `pipx`. These will be passed to `pipx install` and installed as separate packages. You can specify multiple packages by separating them with newlines or spaces.
 
 ## Outputs
 
@@ -43,12 +44,12 @@ jobs:
       - name: Use Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Install and cache packages with pipx
         uses: agnostella/pipx-install@<sha>
         with:
-          package-specs: >-
+          package-specs: |
             'package-1==1.0.0'
             'package-2>=2.0.0<3.0.0'
 

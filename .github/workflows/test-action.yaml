@@ -8,7 +8,7 @@ permissions:
   id-token: write
 
 env:
-  PACKAGE_SPECS: >-
+  PACKAGE_SPECS: |
     'cfn-lint>=1.32.0,<2.0.0'
     'uv==0.6.10'
     'bandit==1.8.3'
@@ -67,14 +67,25 @@ jobs:
 
       - name: Install packages
         uses: ./
-        id: pipx-install
+        id: pipx-install-multiline
         with:
           package-specs: ${{ env.PACKAGE_SPECS }}
 
+      - name: Install packages
+        uses: ./
+        id: pipx-install
+        with:
+          package-specs: "'cfn-lint>=1.32.0,<2.0.0' 'uv==0.6.10' 'bandit==1.8.3'"
+
       - name: Verify installations
         run: |
-          if [[ "${{ steps.pipx-install.outputs.cache-hit }}" != "true" ]]; then
-            echo "Expected packages to have been installed from cache"
+          if [[ "${{ steps.pipx-install.outputs.cache-hit }}" != "true" ||
+                "${{ steps.pipx-install-multiline.outputs.cache-hit }}" != "true" ]]; then
+            echo "
+              Expected packages to have been installed from cache but got
+              space-delimited: ${{ steps.pipx-install.outputs.cache-hit }} and
+              multiline: ${{ steps.pipx-install-multiline.outputs.cache-hit }}
+            "
             exit 1
           fi
 
