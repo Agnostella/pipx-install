@@ -23,12 +23,12 @@ runs:
       shell: bash
       # pipx default home and bin dir are not writable by the cache action
       # so override them here and add the bin dir to PATH for later steps.
-      # This also ensures the pipx cache only contains the tool being installed.
+      # This also ensures the pipx cache only contains the tools being installed.
       run: |
-        python -m pip install -U pipx
-
         PIPX_CACHE="${{ runner.temp }}/.pipx_cache"
         PIPX_BIN_DIR="${PIPX_CACHE}/bin"
+
+        # Replace newlines with spaces and trim leading/trailing whitespace
         PACKAGE_SPECS=$(cat << 'EOF' | tr '\n' ' ' | sed -E 's/(^\s+|\s+$)//g'
         ${{ inputs.package-specs }}
         EOF
@@ -56,9 +56,14 @@ runs:
         key: ${{ runner.os }}-python${{ steps.setup.outputs.python-version }}-pipx${{ steps.setup.outputs.pipx-major-version }}-${{ steps.setup.outputs.pipx-cache-key }}
 
     - name: Install packages
+      if: ${{ !cancelled() }}
       shell: bash
       run: |
+        python -m pip install --upgrade pipx
         cache_hit="${{ steps.cache.outputs.cache-hit }}"
         if [[ "${cache_hit}" != "true" ]]; then
           python -m pipx install ${{ steps.setup.outputs.pipx-package-specs }}
+        else
+          echo "Installed pipx packages:"
+          pipx list
         fi
