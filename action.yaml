@@ -40,7 +40,7 @@ runs:
         echo "pipx-package-specs=${PACKAGE_SPECS}" >> $GITHUB_OUTPUT
         echo "pipx-cache-path=${PIPX_CACHE}" >> $GITHUB_OUTPUT
         echo "pipx-major-version=$(pipx --version | cut -d '.' -f1)" >> $GITHUB_OUTPUT
-        echo "python-version=$(python --version | cut -d ' ' -f2 | cut -d '.' -f1-2)" >> $GITHUB_OUTPUT
+        echo "python-version=$(python --version)" >> $GITHUB_OUTPUT
 
         echo "PIPX_HOME=${PIPX_CACHE}/home" >> $GITHUB_ENV
         echo "PIPX_MAN_DIR=${PIPX_CACHE}/man" >> $GITHUB_ENV
@@ -59,11 +59,11 @@ runs:
       if: ${{ !cancelled() }}
       shell: bash
       run: |
-        python -m pip install --upgrade pipx
+        python -m pip install --upgrade pip pipx
         cache_hit="${{ steps.cache.outputs.cache-hit }}"
         if [[ "${cache_hit}" != "true" ]]; then
           python -m pipx install ${{ steps.setup.outputs.pipx-package-specs }}
-        else
-          echo "Installed pipx packages:"
-          pipx list
         fi
+
+        echo "Installed pipx packages:"
+        python -m pipx list
