@@ -13,6 +13,7 @@ env:
     'cfn-lint>=1.32.0,<2.0.0'
     'uv==0.6.10'
     'bandit==1.8.3'
+  PYTHON_VERSION: "3.12.10"
 
 jobs:
   pipx-install:
@@ -26,7 +27,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install packages
         uses: ./
@@ -64,7 +65,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install packages
         uses: ./
