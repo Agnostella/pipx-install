@@ -53,7 +53,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: ${{ steps.setup.outputs.pipx-cache-path }}
-        key: ${{ runner.os }}-python${{ steps.setup.outputs.python-version }}-pipx${{ steps.setup.outputs.pipx-major-version }}-${{ steps.setup.outputs.pipx-cache-key }}
+        key: ${{ runner.os }}${{ runner.arch }}-python${{ steps.setup.outputs.python-version }}-pipx${{ steps.setup.outputs.pipx-major-version }}-${{ steps.setup.outputs.pipx-cache-key }}
 
     - name: Install packages
       if: ${{ !cancelled() }}
