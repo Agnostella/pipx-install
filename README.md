@@ -1,3 +1,5 @@
+This action has been deprecated. Please use uv and https://github.com/astral-sh/setup-uv.
+
 # pipx-install
 
 Install and cache Python packages with `pipx` in your GitHub Actions workflows.
